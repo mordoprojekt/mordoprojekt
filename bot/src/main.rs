@@ -11,7 +11,7 @@ struct Data{
 struct Config{
     token: String
 }
-fn main() {
+fn readConfig() -> Config {
     let configfile = "config.toml";
     let contents = fs::read_to_string(configfile);
     let readcontents = match contents{
@@ -22,9 +22,10 @@ fn main() {
         Ok(contents) => contents,
         Err(e) => {eprintln!("cokolwiek innego {}", e);exit(1);}
     };
-    println!("{}", data.config.token);
+    return data.config;
 }
-/* use std::env;
+use std::env;
+use std::fs::read;
 
 use serenity::async_trait;
 use serenity::prelude::*;
@@ -47,7 +48,7 @@ async fn main() {
     framework.configure(Configuration::new().prefix("~")); // set the bot's prefix to "~"
 
     // Login with a bot token from the environment
-    let token = env::var("DISCORD_TOKEN").expect("token");
+    let token = readConfig().token;
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(token, intents)
         .event_handler(Handler)
@@ -67,5 +68,3 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
-
- */
