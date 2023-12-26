@@ -2,6 +2,16 @@ use std::fs;
 use std::process::exit;
 use serenity::json::from_str;
 use serde::Deserialize;
+use std::env;
+use std::fs::read;
+use serenity::all::{CreateAttachment, CreateMessage};
+use serenity::all::standard::CommandError;
+
+use serenity::async_trait;
+use serenity::prelude::*;
+use serenity::model::channel::Message;
+use serenity::framework::standard::macros::{command, group};
+use serenity::framework::standard::{StandardFramework, Configuration, CommandResult};
 
 #[derive(Deserialize)]
 struct Data{
@@ -24,17 +34,10 @@ fn readConfig() -> Config {
     };
     return data.config;
 }
-use std::env;
-use std::fs::read;
-
-use serenity::async_trait;
-use serenity::prelude::*;
-use serenity::model::channel::Message;
-use serenity::framework::standard::macros::{command, group};
-use serenity::framework::standard::{StandardFramework, Configuration, CommandResult};
 
 #[group]
 #[commands(ping)]
+#[commands(gimper)]
 struct General;
 
 struct Handler;
@@ -65,6 +68,14 @@ async fn main() {
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     msg.reply(ctx, "Pong!").await?;
+
+    Ok(())
+}
+#[command]
+async fn gimper(ctx: &Context, msg: &Message) -> CommandResult {
+    let builder = CreateMessage::new()
+        .add_file(CreateAttachment::path("img/gimper.jpg").await.unwrap());
+    let msg = msg.channel_id.send_message(&ctx.http, builder).await;
 
     Ok(())
 }
