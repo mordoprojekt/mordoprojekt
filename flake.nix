@@ -24,10 +24,12 @@
                 # nice shell
                 starship.enable = true;
 
+                env.RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
                 # https://search.nixos.org/packages?channel=unstable
                 packages = with pkgs; [
                   rustc
                   cargo
+                  rust-analyzer
                 ];
               }
             ];
