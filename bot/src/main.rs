@@ -1,38 +1,45 @@
+use serde::Deserialize;
+use serenity::all::{CreateAttachment, CreateMessage};
 use std::fs;
 use std::process::exit;
-use serenity::json::from_str;
-use serde::Deserialize;
-use std::env;
-use std::fs::read;
-use serenity::all::{CreateAttachment, CreateMessage};
-use serenity::all::standard::CommandError;
 
 use serenity::async_trait;
-use serenity::prelude::*;
-use serenity::model::channel::Message;
 use serenity::framework::standard::macros::{command, group};
-use serenity::framework::standard::{StandardFramework, Configuration, CommandResult};
+use serenity::framework::standard::{
+    CommandError, CommandResult, Configuration, StandardFramework,
+};
+use serenity::model::channel::Message;
+use serenity::prelude::*;
 
 #[derive(Deserialize)]
-struct Data{
-    config: Config
+struct Data {
+    config: Config,
 }
 #[derive(Deserialize)]
-struct Config{
-    token: String
+struct Config {
+    token: String,
+    prefix: String,
 }
-fn readConfig() -> Config {
-    let configfile = "config.toml";
-    let contents = fs::read_to_string(configfile);
-    let readcontents = match contents{
+
+fn read_config() -> Config {
+    let config_file = "config.toml";
+
+    let contents = match fs::read_to_string(config_file) {
         Ok(contents) => contents,
-        Err(_) => {eprintln!("Could not read file");exit(1);}
+        Err(_) => {
+            eprintln!("Could not read file {}", config_file);
+            exit(1);
+        }
     };
-    let data:Data = match toml::from_str(&readcontents){
+    let data: Data = match toml::from_str(&contents) {
         Ok(contents) => contents,
-        Err(e) => {eprintln!("cokolwiek innego {}", e);exit(1);}
+        Err(e) => {
+            eprintln!("Invalid config file: {}", e);
+            exit(1);
+        }
     };
-    return data.config;
+
+    data.config
 }
 
 #[group]
@@ -47,11 +54,12 @@ impl EventHandler for Handler {}
 
 #[tokio::main]
 async fn main() {
-    let framework = StandardFramework::new().group(&GENERAL_GROUP);
-    framework.configure(Configuration::new().prefix("~")); // set the bot's prefix to "~"
+    let config = read_config();
+    let token = config.token;
 
-    // Login with a bot token from the environment
-    let token = readConfig().token;
+    let framework = StandardFramework::new().group(&GENERAL_GROUP);
+    framework.configure(Configuration::new().prefix(config.prefix));
+
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(token, intents)
         .event_handler(Handler)
@@ -67,15 +75,18 @@ async fn main() {
 
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    msg.reply(ctx, "Pong!").await?;
-
-    Ok(())
+    match msg.reply(ctx, "Pong!").await {
+        Ok(_) => Ok(()),
+        Err(e) => Err(CommandError::from(e)),
+    }
 }
+
 #[command]
 async fn gimper(ctx: &Context, msg: &Message) -> CommandResult {
-    let builder = CreateMessage::new()
-        .add_file(CreateAttachment::path("img/gimper.jpg").await.unwrap());
-    let msg = msg.channel_id.send_message(&ctx.http, builder).await;
-
-    Ok(())
+    let builder =
+        CreateMessage::new().add_file(CreateAttachment::path("img/gimper.jpg").await.unwrap());
+    match msg.channel_id.send_message(&ctx.http, builder).await {
+        Ok(_) => Ok(()),
+        Err(e) => Err(CommandError::from(e)),
+    }
 }
