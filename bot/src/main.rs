@@ -21,6 +21,19 @@ struct Config {
     prefix: String,
 }
 
+struct Attachment {
+    data: Vec<u8>,
+    filename: String,
+}
+
+struct Resources {
+    gimper: Attachment,
+}
+
+impl serenity::prelude::TypeMapKey for Resources {
+    type Value = Resources;
+}
+
 fn read_config() -> Config {
     let config_file = "config.toml";
 
@@ -40,6 +53,33 @@ fn read_config() -> Config {
     };
 
     data.config
+}
+
+use std::fs::File;
+use std::io::Read;
+
+fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
+    let mut f = File::open(&filename).expect("no file found");
+    let metadata = fs::metadata(&filename).expect("unable to read metadata");
+    let mut buffer = vec![0; metadata.len() as usize];
+    f.read(&mut buffer)
+        .expect("get_file_as_byte_vec buffer overflow");
+
+    buffer
+}
+
+// registers global app resources
+async fn create_resources(client: &mut Client) {
+    let gimper = Attachment {
+        data: get_file_as_byte_vec(&String::from("img/gimper.jpg")),
+        filename: String::from("gimper.jpg"),
+    };
+    let resources = Resources {
+        gimper: gimper,
+    };
+
+    let mut data = client.data.write().await;
+    data.insert::<Resources>(resources);
 }
 
 #[group]
@@ -67,6 +107,9 @@ async fn main() {
         .await
         .expect("Error creating client");
 
+    // create app resources
+    create_resources(&mut client).await;
+    
     // start listening for events by starting a single shard
     if let Err(why) = client.start().await {
         println!("An error occurred while running the client: {:?}", why);
@@ -83,8 +126,12 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn gimper(ctx: &Context, msg: &Message) -> CommandResult {
-    let builder =
-        CreateMessage::new().add_file(CreateAttachment::path("img/gimper.jpg").await.unwrap());
+    let data = ctx.data.read().await;
+    let resources = data.get::<Resources>().unwrap();
+    let gimper_attachment =
+        CreateAttachment::bytes(resources.gimper.data.clone(), &resources.gimper.filename);
+
+    let builder = CreateMessage::new().add_file(gimper_attachment);
     match msg.channel_id.send_message(&ctx.http, builder).await {
         Ok(_) => Ok(()),
         Err(e) => Err(CommandError::from(e)),

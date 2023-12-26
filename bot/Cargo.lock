@@ -101,16 +101,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bot"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serenity",
- "tokio",
- "toml",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -747,6 +737,16 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "mordoprojekt"
+version = "0.0.1"
+dependencies = [
+ "serde",
+ "serenity",
+ "tokio",
+ "toml",
 ]
 
 [[package]]
