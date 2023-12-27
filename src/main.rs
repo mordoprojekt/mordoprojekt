@@ -10,6 +10,7 @@ use serenity::{async_trait, Client};
 use std::fs;
 use std::fs::File;
 use std::io::Read;
+use chrono::{Local, DateTime};
 
 #[derive(Deserialize)]
 struct Data {
@@ -81,6 +82,7 @@ impl EventHandler for Handler {}
 
 #[tokio::main]
 async fn main() {
+    println!("{}: Starting server", Local::now());
     let config = read_config();
     let token = config.token;
 
