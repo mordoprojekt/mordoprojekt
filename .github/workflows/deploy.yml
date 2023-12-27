@@ -32,4 +32,4 @@ jobs:
         port: ${{ secrets.PORT }}
         key: ${{ secrets.SSHKEY }}
         source: "dist"
-        target: "~/mordoprojekt"
+        target: "~/"
