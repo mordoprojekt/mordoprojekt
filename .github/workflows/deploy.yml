@@ -12,9 +12,6 @@ jobs:
     - name: Install stable toolchain
       uses: dtolnay/rust-toolchain@stable
 
-    - name: Check that code can compile
-      run: cargo check 
-
     - name: Build
       run: cargo build --release 
 
@@ -25,17 +22,12 @@ jobs:
           target/release/mordoprojekt
           img/gimper.jpg
 
-  deploy:
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-    - name: Executing remote command
-      uses: appleboy/ssh-action@master
+    - name: Copy dist to VPS
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         port: ${{ secrets.PORT }}
         key: ${{ secrets.SSHKEY }}
-        script: echo "I'm in fortnite this is so epic"
+        source: "."
+        target: "~"
