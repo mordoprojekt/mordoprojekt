@@ -91,6 +91,26 @@
         "type": "github"
       }
     },
+    "naersk": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1698420672,
+        "narHash": "sha256-/TdeHMPRjjdJub7p7+w55vyABrsJlt5QkznPYy55vKA=",
+        "owner": "nmattia",
+        "repo": "naersk",
+        "rev": "aeb58d5e8faead8980a807c840232697982d47b9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nmattia",
+        "repo": "naersk",
+        "type": "github"
+      }
+    },
     "nix": {
       "inputs": {
         "lowdown-src": "lowdown-src",
@@ -165,11 +185,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1703600718,
-        "narHash": "sha256-NjH+71JUZX7OQLbS4hjRjqrN8iefnNd5EqfhseGDZIo=",
+        "lastModified": 1703694169,
+        "narHash": "sha256-9KT6Mo+wP3rh/SI5nEy8sbyGHCMf/sC/9fYXygWKLiI=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c97e12fa99c2f5e2a36eeb00575c342ebfcd7d09",
+        "rev": "81e50495c5452370ca68f025a34db6a7ca0b0335",
         "type": "github"
       },
       "original": {
@@ -210,23 +230,8 @@
     "root": {
       "inputs": {
         "devenv": "devenv",
-        "nixpkgs": "nixpkgs_2",
-        "systems": "systems"
-      }
-    },
-    "systems": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
+        "naersk": "naersk",
+        "nixpkgs": "nixpkgs_2"
       }
     }
   },
