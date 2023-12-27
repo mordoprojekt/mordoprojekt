@@ -16,7 +16,7 @@ jobs:
       run: cargo check 
 
     - name: Build
-      uses: cargo build
+      run: cargo build
 
   build:
 
