@@ -11,3 +11,4 @@ serenity = "0.12"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 toml = { version = "0.8.8", features = [] }
 serde = { version = "1.0.193", features = ["derive"] }
+chrono = "0.4.31"
