@@ -33,3 +33,14 @@ jobs:
         key: ${{ secrets.SSHKEY }}
         source: "dist"
         target: "~/"
+
+    - name: Run bot
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        port: ${{ secrets.PORT }}
+        key: ${{ secrets.SSHKEY }}
+        script: |
+          tmux kill-session -t mordoprojekt || true
+          tmux new -d -s mordoprojekt -- ./dist/mordoprojekt || true
