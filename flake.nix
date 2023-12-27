@@ -31,6 +31,7 @@
                   cargo
                   rust-analyzer
                   rustfmt
+                  act
                 ];
               }
             ];
