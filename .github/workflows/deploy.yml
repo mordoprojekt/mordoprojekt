@@ -3,7 +3,7 @@ name: Deploy
 on: [push]
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -16,14 +16,20 @@ jobs:
       run: cargo check 
 
     - name: Build
-      run: cargo build
+      run: cargo build --release 
 
-  build:
+    - uses: actions/upload-artifact@v4
+      with:
+        name: mordoprojekt
+        path: |
+          target/release/mordoprojekt
+          img/gimper.jpg
+
+  deploy:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
 
     - name: Executing remote command
       uses: appleboy/ssh-action@master
