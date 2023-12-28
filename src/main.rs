@@ -1,12 +1,11 @@
 use serde::Deserialize;
-use poise::{serenity_prelude as serenity};
+use poise::serenity_prelude as serenity;
 use serenity::all::{CreateAttachment, GatewayIntents};
-use serenity::client::{EventHandler};
+use serenity::client::EventHandler;
 use serenity::{async_trait, Client};
 use std::fs;
 use std::fs::File;
 use std::io::Read;
-use chrono::{Local};
 use tokio::sync::Mutex;
 
 #[derive(Deserialize)]
@@ -79,7 +78,6 @@ impl EventHandler for Handler {}
 
 #[tokio::main]
 async fn main() {
-    println!("{}: Starting server", Local::now());
     let config = read_config();
     let token = config.token;
     let resources = Mutex::new(create_resources().await);
@@ -126,7 +124,7 @@ async fn age(
 async fn gimper(
     ctx: Context<'_>
 ) -> Result<(), Error> {
-    let gimper = ctx.data().gimper.await?;
+    let gimper = ctx.data().gimper.lock().await;
     let gimper_attachment = CreateAttachment::bytes(
         gimper.data.clone(),
         &gimper.filename,
