@@ -22,6 +22,7 @@ jobs:
       run: |
         {
         mkdir dist
+        cp deploy.sh dist
         cp -r img dist
         cp target/release/mordoprojekt dist
         sed -e "s|DISCORD_BOT_TOKEN|${{ secrets.DISCORD_TOKEN }}|" config-default.toml > dist/config.toml
@@ -45,6 +46,5 @@ jobs:
         port: ${{ secrets.PORT }}
         key: ${{ secrets.SSHKEY }}
         script: |
-          tmux kill-session -t mordoprojekt || true
           cd dist
-          tmux new -d -s mordoprojekt -- ./mordoprojekt
+          bash ./deploy.sh
