@@ -47,4 +47,4 @@ jobs:
         key: ${{ secrets.SSHKEY }}
         script: |
           cd dist
-          bash ./deploy.sh
+          bash ./scripts/deploy.sh
