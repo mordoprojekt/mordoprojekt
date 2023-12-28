@@ -1,5 +1,5 @@
-use serde::Deserialize;
 use poise::serenity_prelude as serenity;
+use serde::Deserialize;
 use serenity::all::{CreateAttachment, GatewayIntents};
 use serenity::client::EventHandler;
 use serenity::{async_trait, Client};
@@ -15,7 +15,6 @@ struct ConfigData {
 #[derive(Deserialize)]
 struct Config {
     token: String,
-    prefix: String,
 }
 
 struct Attachment {
@@ -23,16 +22,8 @@ struct Attachment {
     filename: String,
 }
 
-struct Resources {
-    gimper: Attachment,
-}
-
-impl serenity::prelude::TypeMapKey for Resources {
-    type Value = Resources;
-}
-
 pub struct Data {
-gimper: Mutex<Attachment>
+    gimper: Mutex<Attachment>,
 } // User data, which is stored and accessible in all command invocations
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
@@ -69,8 +60,6 @@ async fn create_resources() -> Attachment {
     return gimper;
 }
 
-struct General;
-
 struct Handler;
 
 #[async_trait]
@@ -89,8 +78,12 @@ async fn main() {
         })
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
-                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {gimper:resources})
+                poise::builtins::register_globally(
+                    ctx,
+                    &framework.options().commands,
+                )
+                .await?;
+                Ok(Data { gimper: resources })
             })
         })
         .build();
@@ -115,41 +108,19 @@ async fn age(
     #[description = "Selected user"] user: Option<serenity::User>,
 ) -> Result<(), Error> {
     let u = user.as_ref().unwrap_or_else(|| ctx.author());
-    let response = format!("{}'s account was created at {}", u.name, u.created_at());
+    let response =
+        format!("{}'s account was created at {}", u.name, u.created_at());
     ctx.say(response).await?;
     Ok(())
 }
 
 #[poise::command(slash_command, prefix_command)]
-async fn gimper(
-    ctx: Context<'_>
-) -> Result<(), Error> {
+async fn gimper(ctx: Context<'_>) -> Result<(), Error> {
     let gimper = ctx.data().gimper.lock().await;
-    let gimper_attachment = CreateAttachment::bytes(
-        gimper.data.clone(),
-        &gimper.filename,
-    );
-    let reply = poise::CreateReply::default()
-        .attachment(gimper_attachment);
+    let gimper_attachment =
+        CreateAttachment::bytes(gimper.data.clone(), &gimper.filename);
+    let reply = poise::CreateReply::default().attachment(gimper_attachment);
 
     ctx.send(reply).await?;
     Ok(())
 }
-
-/*
-#[command]
-async fn gimper(ctx: &Context, msg: &Message) -> CommandResult {
-    let data = ctx.data.read().await;
-    let resources = data.get::<Resources>().unwrap();
-    let gimper_attachment = CreateAttachment::bytes(
-        resources.gimper.data.clone(),
-        &resources.gimper.filename,
-    );
-
-    let builder = CreateMessage::new().add_file(gimper_attachment);
-    match msg.channel_id.send_message(&ctx.http, builder).await {
-        Ok(_) => Ok(()),
-        Err(e) => Err(CommandError::from(e)),
-    }
-}
- */
