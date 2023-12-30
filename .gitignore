@@ -1,3 +1,4 @@
 .devenv
 target
 config.toml
+.envrc
