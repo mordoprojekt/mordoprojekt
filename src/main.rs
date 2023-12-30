@@ -1,5 +1,5 @@
-use openai_api_rs::v1::chat_completion::{ChatCompletionRequest, self};
-use openai_api_rs::v1::common::GPT3_5_TURBO;
+mod commands;
+
 use poise::serenity_prelude as serenity;
 use serenity::all::{CreateAttachment, GatewayIntents};
 use serenity::client::EventHandler;
@@ -58,7 +58,7 @@ async fn main() {
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age(), gimper(), gpt()],
+            commands: vec![commands::age(), commands::gimper(), commands::paintdot(), commands::gpt()],
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
@@ -88,52 +88,4 @@ async fn main() {
     if let Err(why) = client.start().await {
         println!("An error occurred while running the client: {:?}", why);
     }
-}
-
-#[poise::command(slash_command, prefix_command)]
-async fn age(
-    ctx: Context<'_>,
-    #[description = "Selected user"] user: Option<serenity::User>,
-) -> Result<(), Error> {
-    let u = user.as_ref().unwrap_or_else(|| ctx.author());
-    let response =
-        format!("{}'s account was created at {}", u.name, u.created_at());
-    ctx.say(response).await?;
-    Ok(())
-}
-
-#[poise::command(slash_command, prefix_command)]
-async fn gimper(ctx: Context<'_>) -> Result<(), Error> {
-    let gimper = ctx.data().gimper.lock().await;
-    let gimper_attachment =
-        CreateAttachment::bytes(gimper.data.clone(), &gimper.filename);
-    let reply = poise::CreateReply::default().attachment(gimper_attachment);
-
-    ctx.send(reply).await?;
-    Ok(())
-}
-
-#[poise::command(slash_command)]
-async fn gpt(ctx: Context<'_>,
-#[rest]
-    #[description = "prompt"] prompt: String) -> Result<(), Error> {
-    let content = prompt;
-    // TODO: using global singleton client for now, change to transient or scoped
-    let openai_client = ctx.data().openai_client.lock().await;
-    let req = ChatCompletionRequest::new(
-        GPT3_5_TURBO.to_string(),
-        vec![chat_completion::ChatCompletionMessage {
-            role: chat_completion::MessageRole::user,
-            content: content.to_string(),
-            name: None,
-            function_call: None,
-        }],
-    );
-
-    let result = openai_client.chat_completion(req)?;
-    let noresponse = String::from("no response");
-    let content = result.choices[0].message.content.to_owned().unwrap_or(noresponse);
-
-    ctx.reply(content).await?;
-    Ok(())
 }
