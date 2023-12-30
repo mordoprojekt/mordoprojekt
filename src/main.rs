@@ -1,3 +1,5 @@
+mod commands;
+
 use poise::serenity_prelude as serenity;
 use serenity::all::{CreateAttachment, GatewayIntents};
 use serenity::client::EventHandler;
@@ -53,7 +55,7 @@ async fn main() {
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age(), gimper()],
+            commands: vec![commands::age(), commands::gimper(), commands::paintdot()],
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
@@ -80,27 +82,4 @@ async fn main() {
     if let Err(why) = client.start().await {
         println!("An error occurred while running the client: {:?}", why);
     }
-}
-
-#[poise::command(slash_command, prefix_command)]
-async fn age(
-    ctx: Context<'_>,
-    #[description = "Selected user"] user: Option<serenity::User>,
-) -> Result<(), Error> {
-    let u = user.as_ref().unwrap_or_else(|| ctx.author());
-    let response =
-        format!("{}'s account was created at {}", u.name, u.created_at());
-    ctx.say(response).await?;
-    Ok(())
-}
-
-#[poise::command(slash_command, prefix_command)]
-async fn gimper(ctx: Context<'_>) -> Result<(), Error> {
-    let gimper = ctx.data().gimper.lock().await;
-    let gimper_attachment =
-        CreateAttachment::bytes(gimper.data.clone(), &gimper.filename);
-    let reply = poise::CreateReply::default().attachment(gimper_attachment);
-
-    ctx.send(reply).await?;
-    Ok(())
 }
