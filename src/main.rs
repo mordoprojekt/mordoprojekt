@@ -1,7 +1,6 @@
 mod commands;
 
 use poise::serenity_prelude as serenity;
-use serde::Deserialize;
 use serenity::all::{CreateAttachment, GatewayIntents};
 use serenity::client::EventHandler;
 use serenity::{async_trait, Client};
