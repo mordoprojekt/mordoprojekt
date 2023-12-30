@@ -1,6 +1,9 @@
 name: Deploy
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -19,10 +22,8 @@ jobs:
       run: |
         {
         mkdir dist
-        cp scripts/deploy.sh dist
-        cp scripts/restart_on_crash.sh dist
         cp -r img dist
-        cp target/release/mordoprojekt dist/mordoprojekt-bot
+        cp target/release/mordoprojekt dist
         sed -e "s|DISCORD_BOT_TOKEN|${{ secrets.DISCORD_TOKEN }}|" config-default.toml > dist/config.toml
         }
 
@@ -44,5 +45,6 @@ jobs:
         port: ${{ secrets.PORT }}
         key: ${{ secrets.SSHKEY }}
         script: |
+          tmux kill-session -t mordoprojekt || true
           cd dist
-          bash ./deploy.sh
+          tmux new -d -s mordoprojekt -- ./mordoprojekt
