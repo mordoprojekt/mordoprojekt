@@ -50,7 +50,7 @@ pub async fn paintdot(ctx: Context<'_>,
 }
 
 #[poise::command(slash_command)]
-async fn gpt(ctx: Context<'_>,
+pub async fn gpt(ctx: Context<'_>,
 #[rest]
     #[description = "prompt"] prompt: String) -> Result<(), Error> {
     let content = prompt;
