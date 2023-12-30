@@ -89,4 +89,3 @@ async fn main() {
         println!("An error occurred while running the client: {:?}", why);
     }
 }
-

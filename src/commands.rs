@@ -1,3 +1,4 @@
+
 use openai_api_rs::v1::chat_completion::{ChatCompletionRequest, self};
 use openai_api_rs::v1::common::GPT3_5_TURBO;
 use serenity::all::CreateAttachment;
