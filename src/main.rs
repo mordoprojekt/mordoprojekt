@@ -2,22 +2,13 @@ mod commands;
 
 use poise::serenity_prelude as serenity;
 use serde::Deserialize;
-use serenity::all::{GatewayIntents};
+use serenity::all::{CreateAttachment, GatewayIntents};
 use serenity::client::EventHandler;
 use serenity::{async_trait, Client};
-use std::fs;
+use std::{fs, env};
 use std::fs::File;
 use std::io::Read;
 use tokio::sync::Mutex;
-
-#[derive(Deserialize)]
-struct ConfigData {
-    config: Config,
-}
-#[derive(Deserialize)]
-struct Config {
-    token: String,
-}
 
 struct Attachment {
     data: Vec<u8>,
@@ -29,15 +20,6 @@ pub struct Data {
 } // User data, which is stored and accessible in all command invocations
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
-
-fn read_config() -> Config {
-    let config_file = "config.toml";
-
-    let contents = fs::read_to_string(config_file)
-        .expect(&format!("Config file: {} not found.", config_file));
-
-    toml::from_str::<ConfigData>(&contents).expect("").config
-}
 
 fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
     let mut f =
@@ -69,8 +51,7 @@ impl EventHandler for Handler {}
 
 #[tokio::main]
 async fn main() {
-    let config = read_config();
-    let token = config.token;
+    let token = env::var("DISCORD_TOKEN").expect("missing token");
     let resources = Mutex::new(create_resources().await);
 
     let framework = poise::Framework::builder()

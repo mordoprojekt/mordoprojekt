@@ -2,3 +2,4 @@
 target
 config.toml
 img/output.png
+.envrc
