@@ -1,11 +1,14 @@
+use openai_api_rs::v1::chat_completion::{ChatCompletionRequest, self};
+use openai_api_rs::v1::common::GPT3_5_TURBO;
 use poise::serenity_prelude as serenity;
 use serenity::all::{CreateAttachment, GatewayIntents};
 use serenity::client::EventHandler;
 use serenity::{async_trait, Client};
-use std::{fs, env};
 use std::fs::File;
 use std::io::Read;
+use std::{env, fs};
 use tokio::sync::Mutex;
+use openai_api_rs::v1::api::Client as OpenAiClient;
 
 struct Attachment {
     data: Vec<u8>,
@@ -14,7 +17,8 @@ struct Attachment {
 
 pub struct Data {
     gimper: Mutex<Attachment>,
-} // User data, which is stored and accessible in all command invocations
+    openai_client: Mutex<OpenAiClient>,
+}
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
@@ -49,11 +53,12 @@ impl EventHandler for Handler {}
 #[tokio::main]
 async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("missing token");
-    let resources = Mutex::new(create_resources().await);
+    let gimper_attachment = Mutex::new(create_resources().await);
+    let openai_client = Mutex::new(OpenAiClient::new(env::var("OPENAI_API_KEY").unwrap().to_string()));
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age(), gimper()],
+            commands: vec![age(), gimper(), gpt()],
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
@@ -63,7 +68,10 @@ async fn main() {
                     &framework.options().commands,
                 )
                 .await?;
-                Ok(Data { gimper: resources })
+                Ok(Data {
+                    gimper: gimper_attachment,
+                    openai_client
+                })
             })
         })
         .build();
@@ -102,5 +110,30 @@ async fn gimper(ctx: Context<'_>) -> Result<(), Error> {
     let reply = poise::CreateReply::default().attachment(gimper_attachment);
 
     ctx.send(reply).await?;
+    Ok(())
+}
+
+#[poise::command(slash_command)]
+async fn gpt(ctx: Context<'_>,
+#[rest]
+    #[description = "prompt"] prompt: String) -> Result<(), Error> {
+    let content = prompt;
+    // TODO: using global singleton client for now, change to transient or scoped
+    let openai_client = ctx.data().openai_client.lock().await;
+    let req = ChatCompletionRequest::new(
+        GPT3_5_TURBO.to_string(),
+        vec![chat_completion::ChatCompletionMessage {
+            role: chat_completion::MessageRole::user,
+            content: content.to_string(),
+            name: None,
+            function_call: None,
+        }],
+    );
+
+    let result = openai_client.chat_completion(req)?;
+    let noresponse = String::from("no response");
+    let content = result.choices[0].message.content.to_owned().unwrap_or(noresponse);
+
+    ctx.reply(content).await?;
     Ok(())
 }

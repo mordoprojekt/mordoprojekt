@@ -792,6 +792,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "minreq"
+version = "2.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb3371dfc7b772c540da1380123674a8e20583aca99907087d990ca58cf44203"
+dependencies = [
+ "log",
+ "once_cell",
+ "rustls",
+ "rustls-webpki",
+ "serde",
+ "serde_json",
+ "webpki-roots",
+]
+
+[[package]]
 name = "mio"
 version = "0.8.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -807,6 +822,7 @@ name = "mordoprojekt"
 version = "0.0.1"
 dependencies = [
  "chrono",
+ "openai-api-rs",
  "poise",
  "serde",
  "serenity",
@@ -847,6 +863,17 @@ name = "once_cell"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+
+[[package]]
+name = "openai-api-rs"
+version = "2.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6290b87380dad483fd1d8a001d8dd125292657864fb37d8e4a57e432b006fc49"
+dependencies = [
+ "minreq",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "parking_lot"
