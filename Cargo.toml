@@ -13,3 +13,4 @@ toml = { version = "0.8.8", features = [] }
 serde = { version = "1.0.193", features = ["derive"] }
 chrono = "0.4.31"
 poise = "0.6.1-rc1"
+image = "0.24.7"
