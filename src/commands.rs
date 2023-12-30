@@ -48,7 +48,6 @@ pub async fn paintdot(ctx: Context<'_>,
     Ok(())
 }
 
-
 #[poise::command(slash_command)]
 async fn gpt(ctx: Context<'_>,
 #[rest]
