@@ -1,6 +1,7 @@
 #!/bin/bash
 # envoke this file from cron
 
-# TODO:
-# check if such process exists if not run
-# bash ./deploy.sh
+if ! pgrep mordoprojekt >/dev/null 2>&1
+  then
+    bash ~/dist/deploy.sh
+fi

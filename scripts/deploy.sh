@@ -1,3 +1,4 @@
 #!/bin/bash
 tmux kill-session -t mordoprojekt || true
-tmux new -d -s mordoprojekt -- ./mordoprojekt
+sleep 2
+tmux new -d -s mordoprojekt -- ./mordoprojekt-bot

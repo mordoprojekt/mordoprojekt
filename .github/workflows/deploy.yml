@@ -1,9 +1,6 @@
 name: Deploy
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build:
@@ -24,7 +21,7 @@ jobs:
         mkdir dist
         cp deploy.sh dist
         cp -r img dist
-        cp target/release/mordoprojekt dist
+        cp target/release/mordoprojekt dist/mordoprojekt-bot
         sed -e "s|DISCORD_BOT_TOKEN|${{ secrets.DISCORD_TOKEN }}|" config-default.toml > dist/config.toml
         }
 
