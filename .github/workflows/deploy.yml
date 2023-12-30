@@ -19,7 +19,8 @@ jobs:
       run: |
         {
         mkdir dist
-        cp deploy.sh dist
+        cp scripts/deploy.sh dist
+        cp scripts/restart_on_crash.sh dist
         cp -r img dist
         cp target/release/mordoprojekt dist/mordoprojekt-bot
         sed -e "s|DISCORD_BOT_TOKEN|${{ secrets.DISCORD_TOKEN }}|" config-default.toml > dist/config.toml
