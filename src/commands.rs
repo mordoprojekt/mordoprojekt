@@ -10,6 +10,8 @@ use openai_api_rs::v1::common::GPT3_5_TURBO;
 const WIDTH: u32 = 256;
 const HEIGHT: u32 = 256;
 
+const MESSAGE_SIZE_LIMIT: usize = 2000;
+
 #[poise::command(slash_command, prefix_command)]
 pub async fn age(
     ctx: Context<'_>,
@@ -59,9 +61,11 @@ pub async fn gpt(
     #[description = "prompt"]
     prompt: String,
 ) -> Result<(), Error> {
-    // TODO: using global singleton client for now, change to transient or scoped
+    // discord complains if we don't reply within 3 seconds
+    let handle = ctx.reply("🤔").await?;
+
     let openai_client = ctx.data().openai_client.lock().await;
-    let req = ChatCompletionRequest::new(
+    let request = ChatCompletionRequest::new(
         GPT3_5_TURBO.to_string(),
         vec![chat_completion::ChatCompletionMessage {
             role: chat_completion::MessageRole::user,
@@ -71,14 +75,21 @@ pub async fn gpt(
         }],
     );
 
-    let result = openai_client.chat_completion(req)?;
-    let noresponse = String::from("no response");
+    // call to openai takes forever
+    let result = openai_client.chat_completion(request)?;
     let content = result.choices[0]
         .message
         .content
         .to_owned()
-        .unwrap_or(noresponse);
+        .unwrap_or("¯\\_(ツ)_/¯".to_string())
+        .chars()
+        .take(MESSAGE_SIZE_LIMIT) // make sure it fits within discord message size limit
+        .collect::<String>();
 
-    ctx.reply(content).await?;
+    // edit previous message to include actual response
+    let create_reply = CreateReply::default().content(content);
+    handle.edit(ctx, create_reply).await?;
+
     Ok(())
 }
+
