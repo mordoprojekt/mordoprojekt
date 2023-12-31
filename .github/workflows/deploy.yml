@@ -39,5 +39,6 @@ jobs:
         port: ${{ secrets.PORT }}
         key: ${{ secrets.SSHKEY }}
         script: |
+          source bot_vars
           cd dist
           ./mordoprojekt -d
