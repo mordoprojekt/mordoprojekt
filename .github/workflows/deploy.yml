@@ -42,6 +42,6 @@ jobs:
         port: ${{ secrets.PORT }}
         key: ${{ secrets.SSHKEY }}
         script: |
-          tmux kill-session -t mordoprojekt || true
+          source bot_vars
           cd dist
-          tmux new -d -s mordoprojekt -- ./mordoprojekt
+          ./mordoprojekt -d
