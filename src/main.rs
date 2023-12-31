@@ -64,6 +64,7 @@ async fn main() {
                 commands::gimper(),
                 commands::paintdot(),
                 commands::gpt(),
+                commands::send_embed(),
             ],
             ..Default::default()
         })
