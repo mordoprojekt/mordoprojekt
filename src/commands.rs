@@ -1,7 +1,7 @@
 use crate::{Context, Error};
 
 use poise::CreateReply;
-use serenity::all::{CreateAttachment, User};
+use serenity::all::{Colour, CreateAttachment, CreateEmbed, User};
 
 use image::{ImageBuffer, RgbImage};
 use openai_api_rs::v1::chat_completion::{self, ChatCompletionRequest};
@@ -10,7 +10,7 @@ use openai_api_rs::v1::common::GPT3_5_TURBO;
 const WIDTH: u32 = 256;
 const HEIGHT: u32 = 256;
 
-const MESSAGE_SIZE_LIMIT: usize = 2000;
+const MESSAGE_SIZE_LIMIT: usize = 4096;
 
 #[poise::command(slash_command, prefix_command)]
 pub async fn age(
@@ -83,13 +83,15 @@ pub async fn gpt(
         .to_owned()
         .unwrap_or("¯\\_(ツ)_/¯".to_string())
         .chars()
-        .take(MESSAGE_SIZE_LIMIT) // make sure it fits within discord message size limit
+        .take(MESSAGE_SIZE_LIMIT)
         .collect::<String>();
 
+    let embed = CreateEmbed::default()
+        .title(prompt)
+        .description(content)
+        .color(Colour::RED);
     // edit previous message to include actual response
-    let create_reply = CreateReply::default().content(content);
+    let create_reply = CreateReply::default().embed(embed).content("");
     handle.edit(ctx, create_reply).await?;
-
     Ok(())
 }
-
