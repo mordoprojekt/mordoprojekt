@@ -35,6 +35,8 @@
                   rust-analyzer
                   rustfmt
                   act
+                  gcc
+                  sqlx-cli
                 ];
               }
             ];

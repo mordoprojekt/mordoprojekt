@@ -3,3 +3,4 @@ target
 config.toml
 img/output.png
 .envrc
+database.sqlite
