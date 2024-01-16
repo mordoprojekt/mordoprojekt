@@ -53,7 +53,6 @@ pub async fn paintdot(
     ctx.send(reply).await?;
     Ok(())
 }
-
 #[poise::command(slash_command)]
 pub async fn gpt(
     ctx: Context<'_>,
@@ -86,12 +85,14 @@ pub async fn gpt(
         .take(MESSAGE_SIZE_LIMIT)
         .collect::<String>();
 
+    let title = format!("Prompt: {}", prompt);
+
     let embed = CreateEmbed::default()
-        .title(prompt)
+        .title("Reply:")
         .description(content)
         .color(Colour::RED);
     // edit previous message to include actual response
-    let create_reply = CreateReply::default().embed(embed).content("");
+    let create_reply = CreateReply::default().embed(embed).content(title);
     handle.edit(ctx, create_reply).await?;
     Ok(())
 }
