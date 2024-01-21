@@ -131,10 +131,10 @@ async fn bot_main() {
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands: vec![
-                commands::age(),
-                commands::gimper(),
-                commands::paintdot(),
-                commands::gpt(),
+                commands::age::age(),
+                commands::gimper::gimper(),
+                commands::paintdot::paintdot(),
+                commands::gpt::gpt(),
             ],
             ..Default::default()
         })
