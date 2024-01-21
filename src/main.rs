@@ -135,6 +135,7 @@ async fn bot_main() {
                 commands::gimper::gimper(),
                 commands::paintdot::paintdot(),
                 commands::gpt::gpt(),
+                commands::thread::thread(),
             ],
             ..Default::default()
         })
