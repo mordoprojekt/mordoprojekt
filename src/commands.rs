@@ -85,10 +85,9 @@ pub async fn gpt(
         .take(MESSAGE_SIZE_LIMIT)
         .collect::<String>();
 
-    let message_prompt = format!("Prompt: {}", prompt);
+    let message_prompt = format!(">>> {}", prompt);
 
     let embed = CreateEmbed::default()
-        .title("Reply:")
         .description(content)
         .color(Colour::RED);
     // edit previous message to include actual response
