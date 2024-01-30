@@ -43,7 +43,8 @@ pub async fn gpt(
         .description(content)
         .color(Colour::RED);
     // edit previous message to include actual response
-    let create_reply = CreateReply::default().embed(embed).content(message_prompt);
+    let create_reply =
+        CreateReply::default().embed(embed).content(message_prompt);
     handle.edit(ctx, create_reply).await?;
     Ok(())
 }

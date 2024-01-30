@@ -1,5 +1,5 @@
-use serenity::all::User;
 use crate::{Context, Error};
+use serenity::all::User;
 
 #[poise::command(slash_command, prefix_command)]
 pub async fn age(

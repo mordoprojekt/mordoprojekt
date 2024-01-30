@@ -1,7 +1,7 @@
+use crate::{Context, Error};
 use image::{ImageBuffer, RgbImage};
 use poise::CreateReply;
 use serenity::all::CreateAttachment;
-use crate::{Context, Error};
 
 const WIDTH: u32 = 256;
 const HEIGHT: u32 = 256;

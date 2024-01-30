@@ -1,5 +1,5 @@
-use serenity::all::CreateAttachment;
 use crate::{Context, Error};
+use serenity::all::CreateAttachment;
 
 #[poise::command(slash_command, prefix_command)]
 pub async fn gimper(ctx: Context<'_>) -> Result<(), Error> {

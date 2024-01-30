@@ -1,9 +1,11 @@
 mod commands;
 
 use daemonizr::{Daemonizr, DaemonizrError, Stderr, Stdout};
+use poise::FrameworkOptions;
 use serenity::all::GatewayIntents;
-use serenity::async_trait;
-use serenity::client::EventHandler;
+use serenity::model::id::ChannelId;
+use std::collections::HashSet;
+
 use std::fs::File;
 use std::io::{ErrorKind, Read};
 use std::{env, fs};
@@ -38,14 +40,11 @@ struct Attachment {
 pub struct Data {
     openai_client: Mutex<openAiClient>,
     gimper_attachment: Mutex<Attachment>,
+    chat_threads: Mutex<HashSet<ChannelId>>,
 }
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, crate::Data, Error>;
-
-struct Handler;
-#[async_trait]
-impl EventHandler for Handler {}
 
 fn main() {
     // do we want to run in daemon mode?
@@ -100,7 +99,7 @@ fn main() {
     }
 
     tokio::runtime::Runtime::new()
-        .expect("failed to create runtime")
+        .expect(r#"failed to create runtime"#)
         .block_on(bot_main());
 }
 
@@ -119,6 +118,8 @@ async fn bot_main() {
         }
     };
 
+    // TODO: persistance
+    let chat_threads = Mutex::new(HashSet::new());
     let gimper_attachment = Mutex::new(gimper);
     let openai_client =
         Mutex::new(openAiClient::new(openai_api_key.to_string()));
@@ -126,10 +127,14 @@ async fn bot_main() {
     let app_data = Data {
         gimper_attachment,
         openai_client,
+        chat_threads,
     };
 
     let framework = poise::Framework::builder()
-        .options(poise::FrameworkOptions {
+        .options(FrameworkOptions {
+            event_handler: |ctx, event, framework, data| {
+                Box::pin(event_handler(ctx, event, framework, data))
+            },
             commands: vec![
                 commands::age::age(),
                 commands::gimper::gimper(),
@@ -155,7 +160,6 @@ async fn bot_main() {
     let intents =
         GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
     let mut client = serenityClient::builder(discord_token, intents)
-        .event_handler(Handler)
         .framework(framework)
         .await
         .expect("Error creating client");
@@ -183,4 +187,28 @@ fn create_gimper_attachment() -> Result<Attachment, Error> {
     };
 
     Ok(gimper)
+}
+
+async fn event_handler(
+    ctx: &serenity::client::Context,
+    event: &serenity::client::FullEvent,
+    _framework: poise::FrameworkContext<'_, Data, Error>,
+    data: &Data,
+) -> Result<(), Error> {
+    match event {
+        serenity::client::FullEvent::Message { new_message } => 'handle_new_message: {
+            if new_message.author.id == ctx.cache.current_user().id {
+                break 'handle_new_message;
+            }
+            {
+                let chat_threads = data.chat_threads.lock().await;
+                if !chat_threads.contains(&new_message.channel_id) {
+                    break 'handle_new_message;
+                }
+            }
+            new_message.reply(ctx, "mordo").await?;
+        }
+        _ => {}
+    }
+    Ok(())
 }
